@@ -286,3 +286,21 @@ func findFile(filename string, searchPaths []string) string {
 
 	return ""
 }
+
+// NewSimpleConverterFromData creates a SimpleConverter from raw config JSON data
+// This is useful when config data is embedded or loaded from non-file sources
+func NewSimpleConverterFromData(configData []byte) (*SimpleConverter, error) {
+	// Create a temporary file for the config
+	tmpFile, err := os.CreateTemp("", "opencc-*.json")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.Write(configData); err != nil {
+		return nil, err
+	}
+	tmpFile.Close()
+
+	return NewSimpleConverter(tmpFile.Name())
+}

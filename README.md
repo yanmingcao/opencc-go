@@ -19,18 +19,21 @@ cd opencc-go
 # Build the command-line tool
 go build -o opencc ./cmd/opencc
 
-# Convert text from stdin
-echo "简体汉字" | ./opencc -c data/config/s2t.json
+# Convert text using embedded preset (no external files needed!)
+echo "简体汉字" | ./opencc -c s2t
 # Output: 簡體漢字
 
+# Or use a config file
+echo "简体汉字" | ./opencc -c data/config/s2t.json
+
 # Convert a file
-./opencc -c data/config/s2t.json -i input.txt -o output.txt
+./opencc -c s2t -i input.txt -o output.txt
 ```
 
 ### Or run without building
 
 ```bash
-echo "简体汉字" | go run ./cmd/opencc -c data/config/s2t.json
+echo "简体汉字" | go run ./cmd/opencc -c s2t
 ```
 
 ## Installation
@@ -49,6 +52,10 @@ go install github.com/byvoid/opencc-go/cmd/opencc@latest
 
 Then use:
 ```bash
+# Using embedded preset (no external data files needed!)
+echo "简体汉字" | opencc -c s2t
+
+# Or use a config file
 echo "简体汉字" | opencc -c /path/to/config/s2t.json
 ```
 
@@ -83,31 +90,47 @@ func main() {
 # Show help
 ./opencc -h
 
-# Convert from stdin (default)
+# List all available embedded presets
+./opencc --list
+
+# Convert using embedded preset (no external files needed!)
+echo "简体汉字" | ./opencc -c s2t
+
+# Convert from stdin using config file
 echo "简体汉字" | ./opencc -c data/config/s2t.json
 
 # Convert from file to file
-./opencc -c data/config/s2t.json -i input.txt -o output.txt
+./opencc -c s2t -i input.txt -o output.txt
 
 # Convert from file to stdout
-./opencc -c data/config/s2t.json -i input.txt
+./opencc -c s2t -i input.txt
 ```
 
-### Available Configurations
+### Available Conversion Presets
 
-| Config | Description |
+All presets are **embedded** - no external data files required!
+
+| Preset | Description |
 |--------|-------------|
-| `s2t.json` | Simplified Chinese to Traditional Chinese |
-| `t2s.json` | Traditional Chinese to Simplified Chinese |
-| `s2tw.json` | Simplified Chinese to Taiwan Traditional |
-| `tw2s.json` | Taiwan Traditional to Simplified Chinese |
-| `s2hk.json` | Simplified Chinese to Hong Kong Traditional |
-| `hk2s.json` | Hong Kong Traditional to Simplified Chinese |
-| `s2twp.json` | Simplified Chinese to Taiwan Traditional (with phrases) |
-| `tw2sp.json` | Taiwan Traditional to Simplified Chinese (with phrases) |
-| `jp2t.json` | Japanese Kanji to Traditional Chinese |
-| `t2jp.json` | Traditional Chinese to Japanese Kanji |
-| And more... | See `data/config/` directory |
+| `s2t` | Simplified → Traditional (Mainland China) |
+| `t2s` | Traditional → Simplified (Mainland China) |
+| `s2tw` | Simplified → Traditional (Taiwan) |
+| `tw2s` | Traditional → Simplified (Taiwan) |
+| `s2hk` | Simplified → Traditional (Hong Kong) |
+| `hk2s` | Traditional → Simplified (Hong Kong) |
+| `s2twp` | Simplified → Traditional (Taiwan, with phrases) |
+| `tw2sp` | Traditional → Simplified (Taiwan, with phrases) |
+| `jp2t` | Japanese Kanji → Traditional Chinese |
+| `t2jp` | Traditional Chinese → Japanese Kanji |
+| `hk2t` | Hong Kong → Traditional Chinese |
+| `t2hk` | Traditional Chinese → Hong Kong |
+| `tw2t` | Taiwan → Traditional Chinese |
+| `t2tw` | Traditional Chinese → Taiwan |
+
+You can also use custom config files:
+```bash
+./opencc -c /path/to/custom/config.json
+```
 
 ## Introduction
 
@@ -121,6 +144,7 @@ OpenCC-Go is a pure Go implementation of the OpenCC project, providing conversio
 - **Flexible Configuration**: JSON-based configuration for custom conversion rules
 - **Command-Line Tool**: Easy-to-use CLI for batch processing
 - **Cross-Platform**: Windows, macOS, Linux compatible
+- **Embedded Data**: All conversion presets are embedded - works standalone without external data files!
 
 ## Architecture
 
@@ -219,7 +243,8 @@ opencc-go/
 │   ├── dict/           # Dictionary types and implementations
 │   ├── segmentation/   # Text segmentation
 │   ├── conversion/     # Conversion engine
-│   └── config/         # Configuration loader
+│   ├── config/         # Configuration loader
+│   └── embeddata/      # Embedded config/dictionary data
 ├── data/
 │   ├── config/         # JSON configuration files
 │   ├── dictionary/     # Text dictionary files
@@ -245,6 +270,7 @@ This Go port differs from the original C++ implementation in the following ways:
 - [x] JSON configuration support
 - [x] Command-line tool
 - [x] Comprehensive test coverage
+- [x] Embedded data support (standalone CLI without external files)
 - [ ] Performance benchmarks
 - [ ] Optional: Binary dictionary format support
 

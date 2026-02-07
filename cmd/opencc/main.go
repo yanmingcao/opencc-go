@@ -28,35 +28,35 @@ import (
 	"strings"
 
 	"github.com/byvoid/opencc-go"
+	"github.com/byvoid/opencc-go/pkg/embeddata"
 )
 
 const (
-	version          = "1.1.7-go"
-	defaultConfigDir = "data/config"
+	version = "1.1.7-go"
 )
 
 // Built-in configuration mappings (short name -> config file)
 var configMappings = map[string]string{
-	"s2t":   "s2t.json",
-	"t2s":   "t2s.json",
-	"s2tw":  "s2tw.json",
-	"tw2s":  "tw2s.json",
-	"s2hk":  "s2hk.json",
-	"hk2s":  "hk2s.json",
-	"s2twp": "s2twp.json",
-	"tw2sp": "tw2sp.json",
-	"hk2t":  "hk2t.json",
-	"t2hk":  "t2hk.json",
-	"jp2t":  "jp2t.json",
-	"t2jp":  "t2jp.json",
-	"tw2t":  "tw2t.json",
-	"t2tw":  "t2tw.json",
+	"s2t":   "s2t",
+	"t2s":   "t2s",
+	"s2tw":  "s2tw",
+	"tw2s":  "tw2s",
+	"s2hk":  "s2hk",
+	"hk2s":  "hk2s",
+	"s2twp": "s2twp",
+	"tw2sp": "tw2sp",
+	"hk2t":  "hk2t",
+	"t2hk":  "t2hk",
+	"jp2t":  "jp2t",
+	"t2jp":  "t2jp",
+	"tw2t":  "tw2t",
+	"t2tw":  "t2tw",
 }
 
 func main() {
 	var (
-		configFile  = flag.String("c", "", "Configuration file or short name (e.g., s2t, t2s)")
-		configLong  = flag.String("config", "", "Configuration file or short name")
+		configFile  = flag.String("c", "", "Conversion preset (e.g., s2t, t2s, s2tw)")
+		configLong  = flag.String("config", "", "Conversion preset or config file")
 		inputFile   = flag.String("i", "", "Input file (default: stdin)")
 		inputLong   = flag.String("input", "", "Input file (default: stdin)")
 		outputFile  = flag.String("o", "", "Output file (default: stdout)")
@@ -65,20 +65,22 @@ func main() {
 		versionLong = flag.Bool("version", false, "Show version")
 		showHelp    = flag.Bool("h", false, "Show help")
 		helpLong    = flag.Bool("help", false, "Show help")
+		listConfigs = flag.Bool("list", false, "List all available conversion presets")
 	)
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Open Chinese Convert (OpenCC) %s - Go Port\n\n", version)
-		fmt.Fprintf(os.Stderr, "Usage: %s [options]\n\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "OpenCC-Go %s - Chinese Conversion Tool\n\n", version)
+		fmt.Fprintf(os.Stderr, "Usage: opencc -c <preset|config-file> [options]\n\n")
 		fmt.Fprintf(os.Stderr, "Options:\n")
-		fmt.Fprintf(os.Stderr, "  -c, --config <name|file>  Conversion preset or config file\n")
-		fmt.Fprintf(os.Stderr, "  -i, --input <file>        Input file (default: stdin)\n")
+		fmt.Fprintf(os.Stderr, "  -c, --config <preset|file>  Conversion preset (e.g., s2t) or config file path\n")
+		fmt.Fprintf(os.Stderr, "  -i, --input <file>         Input file (default: stdin)\n")
 		fmt.Fprintf(os.Stderr, "  -o, --output <file>       Output file (default: stdout)\n")
-		fmt.Fprintf(os.Stderr, "  -v, --version             Show version information\n")
-		fmt.Fprintf(os.Stderr, "  -h, --help                Show this help message\n")
-		fmt.Fprintf(os.Stderr, "\nConversion Presets:\n")
-		fmt.Fprintf(os.Stderr, "  s2t    Simplified → Traditional (Mainland)\n")
-		fmt.Fprintf(os.Stderr, "  t2s    Traditional → Simplified (Mainland)\n")
+		fmt.Fprintf(os.Stderr, "  -v, --version              Show version\n")
+		fmt.Fprintf(os.Stderr, "  -h, --help                 Show this help\n")
+		fmt.Fprintf(os.Stderr, "  --list                     List all available presets\n")
+		fmt.Fprintf(os.Stderr, "\nConversion Presets (embedded):\n")
+		fmt.Fprintf(os.Stderr, "  s2t    Simplified → Traditional (Mainland China)\n")
+		fmt.Fprintf(os.Stderr, "  t2s    Traditional → Simplified (Mainland China)\n")
 		fmt.Fprintf(os.Stderr, "  s2tw   Simplified → Traditional (Taiwan)\n")
 		fmt.Fprintf(os.Stderr, "  tw2s   Traditional → Simplified (Taiwan)\n")
 		fmt.Fprintf(os.Stderr, "  s2hk   Simplified → Traditional (Hong Kong)\n")
@@ -88,11 +90,11 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  jp2t   Japanese Kanji → Traditional Chinese\n")
 		fmt.Fprintf(os.Stderr, "  t2jp   Traditional Chinese → Japanese Kanji\n")
 		fmt.Fprintf(os.Stderr, "\nExamples:\n")
-		fmt.Fprintf(os.Stderr, "  %s -c s2t\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "  %s -c s2t -i input.txt -o output.txt\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "  echo \"汉字\" | %s -c s2t\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "  %s -c data/config/s2t.json\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "\nFor custom configurations, provide the full path to a JSON file.\n")
+		fmt.Fprintf(os.Stderr, "  opencc -c s2t -i input.txt -o output.txt\n")
+		fmt.Fprintf(os.Stderr, "  echo \"汉字\" | opencc -c s2t\n")
+		fmt.Fprintf(os.Stderr, "  echo \"汉字\" | opencc -c data/config/s2t.json\n")
+		fmt.Fprintf(os.Stderr, "\nNote: Use presets (s2t, t2s, etc.) for quick conversions without external files.\n")
+		fmt.Fprintf(os.Stderr, "      Or provide a config file path for custom configurations.\n")
 	}
 
 	flag.Parse()
@@ -115,7 +117,7 @@ func main() {
 	}
 
 	if *showVersion {
-		fmt.Printf("OpenCC %s (Go Port)\n", version)
+		fmt.Printf("OpenCC-Go %s\n", version)
 		os.Exit(0)
 	}
 
@@ -124,21 +126,29 @@ func main() {
 		os.Exit(0)
 	}
 
+	if *listConfigs {
+		fmt.Println("Available conversion presets:")
+		for _, config := range embeddata.ListConfigs() {
+			fmt.Printf("  %s\n", config)
+		}
+		os.Exit(0)
+	}
+
 	if *configFile == "" {
-		fmt.Fprintf(os.Stderr, "Error: Configuration is required (-c or --config option)\n\n")
+		fmt.Fprintf(os.Stderr, "Error: Conversion preset is required (-c or --config)\n\n")
 		flag.Usage()
 		os.Exit(1)
 	}
 
-	// Resolve config name to file path
-	configPath := resolveConfig(*configFile)
-	if configPath == "" {
+	// Resolve config name to config content
+	configContent, err := resolveConfig(*configFile)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Cannot find configuration: %s\n", *configFile)
 		os.Exit(1)
 	}
 
-	// Create converter
-	converter, err := opencc.NewSimpleConverter(configPath)
+	// Create converter from embedded config
+	converter, err := opencc.NewSimpleConverterFromData(configContent)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Failed to create converter: %v\n", err)
 		os.Exit(1)
@@ -190,49 +200,43 @@ func main() {
 	}
 }
 
-// resolveConfig resolves a config name or file path to an actual config file path
-func resolveConfig(name string) string {
-	// Check if it's a short name (no path separator, no .json extension)
-	if !strings.ContainsAny(name, "/\\") && !strings.HasSuffix(name, ".json") {
-		if configFile, ok := configMappings[name]; ok {
-			// Try to find the config in the default config directory
-			configPath := filepath.Join(defaultConfigDir, configFile)
-			if _, err := os.Stat(configPath); err == nil {
-				return configPath
+// resolveConfig resolves a config name to its JSON content
+// It supports:
+// 1. File paths (absolute or relative) - reads from disk
+// 2. Embedded preset names (e.g., "s2t", "t2s") - uses embedded data
+func resolveConfig(name string) ([]byte, error) {
+	// First, check if it's a file path that exists
+	if filepath.IsAbs(name) || strings.ContainsAny(name, "/\\") {
+		if _, err := os.Stat(name); err == nil {
+			// File exists, read it
+			data, err := os.ReadFile(name)
+			if err == nil {
+				return data, nil
 			}
 		}
 	}
 
-	// Otherwise, treat it as a file path and search in usual locations
-	return findConfigFile(name)
-}
-
-// findConfigFile searches for a configuration file in various locations
-func findConfigFile(filename string) string {
-	// If it's already a full path, check if it exists
-	if filepath.IsAbs(filename) {
-		if _, err := os.Stat(filename); err == nil {
-			return filename
-		}
-		return ""
-	}
-
-	// Search paths
-	searchPaths := []string{
-		".",                          // Current directory
-		defaultConfigDir,             // Default config directory
-		"/usr/share/opencc",          // System-wide Linux
-		"/usr/local/share/opencc",    // Local installation Linux
-		"/opt/homebrew/share/opencc", // Homebrew macOS
-		"C:\\Program Files\\OpenCC\\share\\opencc", // Windows
-	}
-
-	for _, path := range searchPaths {
-		fullPath := filepath.Join(path, filename)
-		if _, err := os.Stat(fullPath); err == nil {
-			return fullPath
+	// Check if it's a short preset name (no path separator, no .json extension)
+	if !strings.ContainsAny(name, "/\\") && !strings.HasSuffix(name, ".json") {
+		if _, ok := configMappings[name]; ok {
+			// Look up in built-in mappings
+			if configContent, err := embeddata.GetConfig(name); err == nil {
+				return configContent, nil
+			}
 		}
 	}
 
-	return ""
+	// Check if it exists as embedded config (with or without .json)
+	if embeddata.ConfigExists(name) {
+		return embeddata.GetConfig(name)
+	}
+
+	// Check for .json extension
+	if !strings.HasSuffix(name, ".json") {
+		if embeddata.ConfigExists(name + ".json") {
+			return embeddata.GetConfig(name + ".json")
+		}
+	}
+
+	return nil, os.ErrNotExist
 }
