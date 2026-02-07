@@ -261,18 +261,7 @@ This Go port differs from the original C++ implementation in the following ways:
 2. **No Dictionary Compilation**: Reads text dictionaries directly without requiring compilation step
 3. **Pure Go**: No CGO or external dependencies
 4. **Simplified Architecture**: Focuses on core conversion functionality
-
-## Roadmap
-
-- [x] Core dictionary system
-- [x] Maximum forward matching segmentation
-- [x] Multi-stage conversion chain
-- [x] JSON configuration support
-- [x] Command-line tool
-- [x] Comprehensive test coverage
-- [x] Embedded data support (standalone CLI without external files)
-- [ ] Performance benchmarks
-- [ ] Optional: Binary dictionary format support
+5. **Embedded Presets**: All conversion presets (s2t, t2s, etc.) are embedded - CLI works standalone without external files
 
 ## License
 
