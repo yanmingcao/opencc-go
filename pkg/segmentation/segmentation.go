@@ -19,7 +19,7 @@
 package segmentation
 
 import (
-	"github.com/byvoid/opencc-go/pkg/dict"
+	"github.com/yanmingcao/opencc-go/pkg/dict"
 )
 
 // Segmentation interface for text segmentation strategies

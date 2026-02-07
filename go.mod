@@ -1,4 +1,4 @@
-module github.com/byvoid/opencc-go
+module github.com/yanmingcao/opencc-go
 
 go 1.21
 

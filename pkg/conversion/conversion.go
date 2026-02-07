@@ -19,8 +19,8 @@
 package conversion
 
 import (
-	"github.com/byvoid/opencc-go/pkg/dict"
-	"github.com/byvoid/opencc-go/pkg/segmentation"
+	"github.com/yanmingcao/opencc-go/pkg/dict"
+	"github.com/yanmingcao/opencc-go/pkg/segmentation"
 )
 
 // Conversion performs a single conversion step using a dictionary

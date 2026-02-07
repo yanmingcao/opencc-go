@@ -23,10 +23,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/byvoid/opencc-go/pkg/config"
-	"github.com/byvoid/opencc-go/pkg/conversion"
-	"github.com/byvoid/opencc-go/pkg/dict"
-	"github.com/byvoid/opencc-go/pkg/segmentation"
+	"github.com/yanmingcao/opencc-go/pkg/config"
+	"github.com/yanmingcao/opencc-go/pkg/conversion"
+	"github.com/yanmingcao/opencc-go/pkg/dict"
+	"github.com/yanmingcao/opencc-go/pkg/segmentation"
 )
 
 // Converter is the main controller for segmentation and conversion

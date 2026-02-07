@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 
-	"github.com/byvoid/opencc-go"
-	"github.com/byvoid/opencc-go/pkg/conversion"
-	"github.com/byvoid/opencc-go/pkg/dict"
-	"github.com/byvoid/opencc-go/pkg/segmentation"
+	"github.com/yanmingcao/opencc-go"
+	"github.com/yanmingcao/opencc-go/pkg/conversion"
+	"github.com/yanmingcao/opencc-go/pkg/dict"
+	"github.com/yanmingcao/opencc-go/pkg/segmentation"
 )
 
 func main() {

@@ -27,8 +27,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/byvoid/opencc-go"
-	"github.com/byvoid/opencc-go/pkg/embeddata"
+	"github.com/yanmingcao/opencc-go"
+	"github.com/yanmingcao/opencc-go/pkg/embeddata"
 )
 
 const (
