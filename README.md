@@ -13,7 +13,7 @@ This is a pure Go implementation of the original [OpenCC](https://github.com/BYV
 
 ```bash
 # Clone the repository
-git clone https://github.com/byvoid/opencc-go.git
+git clone https://github.com/yanmingcao/opencc-go.git
 cd opencc-go
 
 # Build the command-line tool
@@ -41,13 +41,13 @@ echo "简体汉字" | go run ./cmd/opencc -c s2t
 ### As a Library
 
 ```bash
-go get github.com/byvoid/opencc-go
+go get github.com/yanmingcao/opencc-go
 ```
 
 ### As a CLI Tool
 
 ```bash
-go install github.com/byvoid/opencc-go/cmd/opencc@latest
+go install github.com/yanmingcao/opencc-go/cmd/opencc@latest
 ```
 
 Then use:
@@ -68,7 +68,7 @@ package main
 
 import (
     "fmt"
-    "github.com/byvoid/opencc-go"
+    "github.com/yanmingcao/opencc-go"
 )
 
 func main() {
