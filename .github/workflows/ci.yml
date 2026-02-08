@@ -27,8 +27,16 @@ jobs:
       - name: Test
         run: go test ./...
 
-      - name: Verify CLI
+      - name: Verify CLI (Unix)
+        if: runner.os != 'Windows'
         run: |
           echo "简体汉字" | ./opencc -c s2t
           echo "中国" | ./opencc -c t2s
           ./opencc --list
+
+      - name: Verify CLI (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          "简体汉字" | & .\opencc.exe -c s2t
+          "中国" | & .\opencc.exe -c t2s
+          & .\opencc.exe --list
