@@ -1,7 +1,9 @@
 package opencc
 
 import (
+	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -12,9 +14,17 @@ func TestCLIPathHandling(t *testing.T) {
 		configPath string
 	}{
 		{"forward slashes", "data/config/s2t.json"},
-		{"backslashes", "data\\config\\s2t.json"},
-		{"absolute forward", filepath.Join(getWD(t), "data/config/s2t.json")},
 	}
+	if runtime.GOOS == "windows" {
+		tests = append(tests, struct {
+			name       string
+			configPath string
+		}{"backslashes", "data\\config\\s2t.json"})
+	}
+	tests = append(tests, struct {
+		name       string
+		configPath string
+	}{"absolute", filepath.Join(getWD(t), filepath.FromSlash("data/config/s2t.json"))})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -35,8 +45,11 @@ func TestCLIPathHandling(t *testing.T) {
 }
 
 func getWD(t *testing.T) string {
+	t.Helper()
 	// Get test working directory
-	wd := ""
-	// In test environment, use relative path
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("failed to get working directory: %v", err)
+	}
 	return wd
 }
