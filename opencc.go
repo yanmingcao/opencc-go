@@ -19,6 +19,8 @@
 package opencc
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -26,6 +28,7 @@ import (
 	"github.com/yanmingcao/opencc-go/pkg/config"
 	"github.com/yanmingcao/opencc-go/pkg/conversion"
 	"github.com/yanmingcao/opencc-go/pkg/dict"
+	"github.com/yanmingcao/opencc-go/pkg/embeddata"
 	"github.com/yanmingcao/opencc-go/pkg/segmentation"
 )
 
@@ -243,6 +246,18 @@ func loadDictFromConfig(cfg *config.DictConfig, searchPaths []string) (dict.Dict
 func loadTextDict(filename string, searchPaths []string) (dict.Dict, error) {
 	path := findFile(filename, searchPaths)
 	if path == "" {
+		if filepath.Base(filename) == filename {
+			content, err := embeddata.GetDict(filename)
+			if err == nil {
+				lexicon, err := dict.ParseLexiconFromReader(bufio.NewReader(bytes.NewReader(content)))
+				if err != nil {
+					return nil, err
+				}
+
+				lexicon.Sort()
+				return dict.NewTextDict(lexicon), nil
+			}
+		}
 		return nil, fmt.Errorf("dictionary file not found: %s (searched in: %v)", filename, searchPaths)
 	}
 
