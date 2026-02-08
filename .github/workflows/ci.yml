@@ -21,8 +21,13 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Build
+      - name: Build (Unix)
+        if: runner.os != 'Windows'
         run: go build -o opencc ./cmd/opencc
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: go build -o opencc.exe ./cmd/opencc
 
       - name: Test
         run: go test ./...
@@ -37,6 +42,7 @@ jobs:
       - name: Verify CLI (Windows)
         if: runner.os == 'Windows'
         run: |
-          "简体汉字" | & .\opencc.exe -c s2t
-          "中国" | & .\opencc.exe -c t2s
-          & .\opencc.exe --list
+          $exe = if (Test-Path .\opencc.exe) { ".\opencc.exe" } else { ".\opencc" }
+          "简体汉字" | & $exe -c s2t
+          "中国" | & $exe -c t2s
+          & $exe --list
